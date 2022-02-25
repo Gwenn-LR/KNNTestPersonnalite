@@ -1,4 +1,4 @@
-#TODO:
+#TODO: Encodage par colonne
 
 ## [x] Création du dataset
 

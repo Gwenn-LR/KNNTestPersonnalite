@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from sklearn.preprocessing import LabelEncoder
+
 
 def minuscule(dataset: pd.DataFrame) -> pd.DataFrame:
     r"""Modifie la casse des éléments du DataFrame en minuscule.
@@ -161,7 +163,7 @@ def conversionCoquille(dataset: pd.DataFrame) -> pd.DataFrame:
 
     # On différencie les colonnes en fonction des réponses attendues
     for column in dataset.columns:
-        if column in ["Q1", "Q2", "Q3", "Q4"]:
+        if column in ["Q1", "Q2", "Q3", "Q4", "Q5"]:
 
             # On remplace les valeurs proches des réponses attendues (a, b ou c)
             dataset[column] = dataset[column].replace(
@@ -173,11 +175,13 @@ def conversionCoquille(dataset: pd.DataFrame) -> pd.DataFrame:
 
             # On remplace les valeurs restantes par des NaN
             listValNan = dataset[column].unique()
+            print(listValNan)
             listValNan = [
                 val for val in listValNan if val not in ("a", "b", "c")]
             dataset[column] = dataset[column].replace(listValNan, np.nan)
+            #isin()
 
-        else:
+        elif column in ["Q6", "Q7", "Q8", "Q9", "Q10"]:
 
             # On remplace les valeurs proches des réponses attendues (1, 2 ou 3)
             dataset[column] = dataset[column].replace(
@@ -195,14 +199,167 @@ def conversionCoquille(dataset: pd.DataFrame) -> pd.DataFrame:
 
     return dataset
 
+def remplacerNan(dataset: pd.DataFrame) -> pd.DataFrame:
+    r"""Modifie les valeurs NaN du dataset avec le mode.    
+
+    Several sentences providing an extended description. Refer to
+    variables using back-ticks, e.g. `var`.
+
+    Parameters
+    ----------
+    dataset 
+        Le DataFrame à modifier
+
+    Returns
+    -------
+    dataset 
+        Le DataFrame modifié
+
+    Other Parameters
+    ----------------
+    only_seldom_used_keyword : int, optional
+        Infrequently used parameters can be described under this optional
+        section to prevent cluttering the Parameters section.
+    **kwargs : dict
+        Other infrequently used keyword arguments. Note that all keyword
+        arguments appearing after the first parameter specified under the
+        Other Parameters section, should also be described under this
+        section.
+
+    Raises
+    ------
+    BadException
+        Because you shouldn't have done that.
+
+    See Also
+    --------
+    numpy.array : Relationship (optional).
+
+    Notes
+    -----
+    Notes about the implementation algorithm (if needed).
+
+    This can have multiple paragraphs.
+
+    You may include some math:
+
+    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+    And even use a Greek symbol like :math:`\omega` inline.
+
+    References
+    ----------
+    Cite the relevant literature, e.g. [1]_.  You may also cite these
+    references in the notes section above.
+
+    .. [1] O. McNoleg, "The integration of GIS, remote sensing,
+       expert systems and adaptive co-kriging for environmental habitat
+       modelling of the Highland Haggis using object-oriented, fuzzy-logic
+       and neural-network techniques," Computers & Geosciences, vol. 22,
+       pp. 585-588, 1996.
+
+    Examples
+    --------
+    These are written in doctest format, and should illustrate how to
+    use the function.
+
+    >>> a = [1, 2, 3]
+    >>> print([x + 3 for x in a])
+    [4, 5, 6]
+    >>> print("a\nb")
+    a
+    b
+    """
+    
+    dataset = dataset.apply(lambda x:x.fillna(x.value_counts().index[0])) # Le mode ne fonctionne pas vu que l'on a plus de valeur NaN que les autres
+
+    return dataset
+
+def encodageTexte(dataset: pd.DataFrame) -> pd.DataFrame:
+    r"""Encode les valeurs textuelles en valeurs numériques.    
+
+    Several sentences providing an extended description. Refer to
+    variables using back-ticks, e.g. `var`.
+
+    Parameters
+    ----------
+    dataset 
+        Le DataFrame à modifier
+
+    Returns
+    -------
+    dataset 
+        Le DataFrame modifié
+
+    Other Parameters
+    ----------------
+    only_seldom_used_keyword : int, optional
+        Infrequently used parameters can be described under this optional
+        section to prevent cluttering the Parameters section.
+    **kwargs : dict
+        Other infrequently used keyword arguments. Note that all keyword
+        arguments appearing after the first parameter specified under the
+        Other Parameters section, should also be described under this
+        section.
+
+    Raises
+    ------
+    BadException
+        Because you shouldn't have done that.
+
+    See Also
+    --------
+    numpy.array : Relationship (optional).
+
+    Notes
+    -----
+    Notes about the implementation algorithm (if needed).
+
+    This can have multiple paragraphs.
+
+    You may include some math:
+
+    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+    And even use a Greek symbol like :math:`\omega` inline.
+
+    References
+    ----------
+    Cite the relevant literature, e.g. [1]_.  You may also cite these
+    references in the notes section above.
+
+    .. [1] O. McNoleg, "The integration of GIS, remote sensing,
+       expert systems and adaptive co-kriging for environmental habitat
+       modelling of the Highland Haggis using object-oriented, fuzzy-logic
+       and neural-network techniques," Computers & Geosciences, vol. 22,
+       pp. 585-588, 1996.
+
+    Examples
+    --------
+    These are written in doctest format, and should illustrate how to
+    use the function.
+
+    >>> a = [1, 2, 3]
+    >>> print([x + 3 for x in a])
+    [4, 5, 6]
+    >>> print("a\nb")
+    a
+    b
+    """
+    
+    labelEncoder = LabelEncoder()
+    dataset = labelEncoder.fit_transform(dataset)
+
+    return dataset
+
 if __name__ == "__main__":
     datasetCSV = pd.read_csv("Run_Questionnaire/DataSetTotal.csv")
+
     print(datasetCSV)
+
     datasetPretraite = minuscule(datasetCSV)
     datasetPretraite = conversionCoquille(datasetPretraite)
-
-    # for column in datasetPretraite.columns:
-    #     print(datasetPretraite[column].value_counts())
-    #     print("---------------")
+    datasetPretraite = remplacerNan(datasetPretraite)
+    # datasetPretraite = encodageTexte(datasetPretraite)
 
     print(datasetPretraite)
