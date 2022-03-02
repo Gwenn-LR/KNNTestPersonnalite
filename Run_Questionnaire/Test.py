@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import joblib
 
 class Question:
      def __init__(self, prompt):
@@ -55,20 +56,32 @@ questions = [
 def run_quiz(questions, Interpretation):
      score = 0
      Data = []
+     answers = []
      for question in questions:
           answer = input(question.prompt)
           Data.append(answer)
           if answer == 'a' or answer == '1':
                score += 1
+               answers.append(0)
           elif answer == 'b' or answer == '2':
               score += 0
+              answers.append(1)
           elif answer == 'c' or answer == '3':
               score += 2
+              answers.append(2)
      
      print("\nVotre Score est : ", score,'\n')
      
      print('-----------------------------------------')
-     print('\n--------- Interprétation final ---------\n')
+     print('\n--------- Prédiction ---------\n')
+     print('-----------------------------------------')
+
+     knn = joblib.load("../ModeleKNN.pkl")
+     prediction = knn.predict(np.array(answers).reshape(-1, 10))
+     print(f"Votre note prédite est : {prediction[0]}")
+
+     print('-----------------------------------------')
+     print('\n--------- Interprétation finale ---------\n')
      print('-----------------------------------------')
      
      if score < 30 and score >=20:
@@ -80,6 +93,7 @@ def run_quiz(questions, Interpretation):
      elif score < 10:
          Label = 'C'
          print(Interpretation[2])
+     print(f"Votre note interprétée est : {Label}")
      print('-----------------------------------------\n')
       
      Data.append(score)
